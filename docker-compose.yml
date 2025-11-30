@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: corporate-actions-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: corporate_actions
+      MYSQL_USER: corpactions
+      MYSQL_PASSWORD: corpactions_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+      interval: 10s
+    networks:
+      - corporate-actions-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: corporate-actions-backend
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: corpactions
+      DB_PASSWORD: corpactions_pass
+      DB_NAME: corporate_actions
+      DEBUG: "false"
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      timeout: 5s
+      retries: 5
+      interval: 10s
+    networks:
+      - corporate-actions-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: corporate-actions-frontend
+    environment:
+      VITE_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - corporate-actions-net
+
+volumes:
+  mysql_data:
+
+networks:
+  corporate-actions-net:
+    driver: bridge
