@@ -108,10 +108,10 @@ corporate-actions-demo/
 ## Product Roadmap Highlights
 
 ### Sprint 1 (MVP - Current)
-- ✅ Real-time event ingestion via REST API
-- ✅ MySQL persistence with audit trail
-- ✅ Basic event processor with status tracking
-- ✅ Metrics dashboard
+-  Real-time event ingestion via REST API
+-  MySQL persistence with audit trail
+-  Basic event processor with status tracking
+-  Metrics dashboard
 
 ### Sprint 2 (Resilience)
 - Idempotency keys for duplicate detection
